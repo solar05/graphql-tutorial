@@ -18,12 +18,18 @@ module Mutations
       return unless user.authenticate(credentials[:password])
 
       # use Ruby on Rails - ActiveSupport::MessageEncryptor, to build a token
-      crypt = ActiveSupport::MessageEncryptor.new(Rails.application.credentials.secret_key_base.byteslice(0..31))
+      crypt = ActiveSupport::MessageEncryptor.new(generate_secret())
       token = crypt.encrypt_and_sign("user-id:#{ user.id }")
 
       context[:session][:token] = token
 
       { user: user, token: token }
+    end
+
+    private
+
+    def generate_secret()
+      10.times.map{ 20 + Random.rand(10000...20000) }.join('').byteslice(0..31)
     end
   end
 end
