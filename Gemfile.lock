@@ -71,6 +71,7 @@ GEM
     ffi (1.15.5)
     globalid (1.0.0)
       activesupport (>= 5.0)
+    graphql (1.11.6)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     jbuilder (2.11.5)
@@ -171,6 +172,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
+  graphql (= 1.11.6)
   jbuilder (~> 2.7)
   listen (~> 3.3)
   puma (~> 5.0)
