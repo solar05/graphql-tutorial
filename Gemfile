@@ -35,6 +35,8 @@ group :development do
   gem 'listen', '~> 3.3'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+  gem 'pry'
+  gem 'ruby-lsp', '~> 0.3.2'
 end
 
 gem 'bcrypt', '~> 3.1.13'
@@ -47,3 +49,5 @@ gem 'search_object_graphql', '0.3.1'
 
 gem 'pg'
 
+gem "yabeda-prometheus"
+gem 'sidekiq', '~> 6.0.0'

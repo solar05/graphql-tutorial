@@ -14,6 +14,7 @@ require "action_view/railtie"
 # require "action_cable/engine"
 require "sprockets/railtie"
 require "rails/test_unit/railtie"
+require_relative "../lib/rack/middleware"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -34,5 +35,6 @@ module GraphqlTutorial
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    config.middleware.use(Rack::Middleware)
   end
 end
