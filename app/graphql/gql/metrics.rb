@@ -1,5 +1,5 @@
-module Metrics
-  class Gql
+module Gql
+  class Metrics
     class Error < StandardError
     end
 
@@ -35,7 +35,7 @@ module Metrics
     def self.use(schema)
       schema.instrument(
         :query,
-        Metrics::MyInstrument.new(service_name: "a")
+        ::Gql::MyInstrument.new(service_name: "a")
       )
     end
   end

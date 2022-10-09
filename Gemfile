@@ -51,3 +51,4 @@ gem 'pg'
 
 gem "yabeda-prometheus"
 gem 'sidekiq', '~> 6.0.0'
+gem "sentry-ruby"
