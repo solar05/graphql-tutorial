@@ -24,15 +24,18 @@ module Gql
       histogram :request_duration_seconds,
                 comment: "A histogram of query resolving time",
                 unit: :seconds,
-                tags: %i[service operation_status operation_name],
+                tags: %i[service operation_status operation_name operation_type operation_complexity operation_depth],
                 buckets: Prometheus::Client::Histogram::DEFAULT_BUCKETS
 
       counter :requests_total,
               comment: "Total number of GQL requests made",
-              tags: %i[service operation_status operation_name]
+              tags: %i[service operation_status operation_name operation_type]
     end
 
     def self.use(schema)
+      schema.query_analyzer(::Gql::QueryDepth)
+      schema.query_analyzer(::Gql::QueryComplexity)
+
       schema.instrument(
         :query,
         ::Gql::MyInstrument.new(service_name: "a")
