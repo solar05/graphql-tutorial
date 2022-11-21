@@ -45,8 +45,8 @@ module Gql
         operation_status: operation_status,
         operation_name: operation_name,
         operation_type: operation_type,
-        operation_complexity: query.context.namespace(Gql::Metrics)[:query_complexity],
-        operation_depth: query.context.namespace(Gql::Metrics)[:query_depth]
+        operation_complexity: query.context.namespace(Gql::Metrics)[:query_complexity] || 0,
+        operation_depth: query.context.namespace(Gql::Metrics)[:query_depth] || 0
       }
 
       start = query.context.namespace(Gql::Metrics)[:start_time]
