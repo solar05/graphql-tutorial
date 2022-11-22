@@ -11,6 +11,7 @@ module Gql
     end
 
     def after_query(query)
+      collecting_initial_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       operation_status = query.valid? ? '[success]' : '[fail]'
       raw_operation_name = query.operation_name
 
@@ -22,8 +23,8 @@ module Gql
         'unrecognizedOperation'
       end
 
-      query_execution_time(query, operation_status, operation_name, operation_type)
       query_result(operation_status, operation_name, operation_type)
+      query_execution_time(query, operation_status, operation_name, operation_type, collecting_initial_time)
     end
 
     private
@@ -39,14 +40,15 @@ module Gql
       Yabeda.graphql.requests_total.increment(tags)
     end
 
-    def query_execution_time(query, operation_status, operation_name, operation_type)
+    def query_execution_time(query, operation_status, operation_name, operation_type, collecting_time)
       tags = {
         service: service,
         operation_status: operation_status,
         operation_name: operation_name,
         operation_type: operation_type,
-        operation_complexity: query.context.namespace(Gql::Metrics)[:query_complexity] || 0,
-        operation_depth: query.context.namespace(Gql::Metrics)[:query_depth] || 0
+        operation_complexity: query.context.namespace(Gql::Metrics)[:query_complexity],
+        operation_depth: query.context.namespace(Gql::Metrics)[:query_depth],
+        metrics_collection_overhead: ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - collecting_time
       }
 
       start = query.context.namespace(Gql::Metrics)[:start_time]

@@ -24,7 +24,10 @@ module Gql
       histogram :request_duration_seconds,
                 comment: "A histogram of query resolving time",
                 unit: :seconds,
-                tags: %i[service operation_status operation_name operation_type operation_complexity operation_depth],
+                tags: %i[
+                  service operation_status operation_name operation_type
+                  operation_complexity operation_depth metrics_collection_overhead
+                ],
                 buckets: Prometheus::Client::Histogram::DEFAULT_BUCKETS
 
       counter :requests_total,
