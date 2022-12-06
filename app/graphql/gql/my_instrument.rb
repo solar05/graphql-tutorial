@@ -1,17 +1,10 @@
 module Gql
   class MyInstrument
-    attr_reader :service
-
-    def initialize(service_name:)
-      @service = service_name
-    end
-
     def before_query(query)
       setup_time!(query)
     end
 
     def after_query(query)
-      collecting_initial_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       operation_status = query.valid? ? '[success]' : '[fail]'
       raw_operation_name = query.operation_name
 
@@ -23,15 +16,14 @@ module Gql
         'unrecognizedOperation'
       end
 
+      query_execution_time(query, operation_status, operation_name, operation_type)
       query_result(operation_status, operation_name, operation_type)
-      query_execution_time(query, operation_status, operation_name, operation_type, collecting_initial_time)
     end
 
     private
 
     def query_result(operation_status, operation_name, operation_type)
       tags = {
-        service: service,
         operation_status: operation_status,
         operation_name: operation_name,
         operation_type: operation_type
@@ -40,22 +32,20 @@ module Gql
       Yabeda.graphql.requests_total.increment(tags)
     end
 
-    def query_execution_time(query, operation_status, operation_name, operation_type, collecting_time)
+    def query_execution_time(query, operation_status, operation_name, operation_type)
       tags = {
-        service: service,
         operation_status: operation_status,
         operation_name: operation_name,
         operation_type: operation_type,
-        operation_complexity: query.context.namespace(Gql::Metrics)[:query_complexity],
-        operation_depth: query.context.namespace(Gql::Metrics)[:query_depth],
-        metrics_collection_overhead: ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - collecting_time
+        operation_complexity: query.context.namespace(Gql::Metrics).fetch(:query_complexity, 0),
+        operation_depth: query.context.namespace(Gql::Metrics).fetch(:query_depth, 0),
       }
 
       start = query.context.namespace(Gql::Metrics)[:start_time]
       lel = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
       elapsed = lel - start
 
-      Yabeda.graphql.request_duration_seconds.measure(tags, elapsed)
+      Yabeda.graphql.request_duration.measure(tags, elapsed)
     end
 
     def setup_time!(query)
